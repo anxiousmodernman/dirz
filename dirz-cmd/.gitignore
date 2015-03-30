@@ -1,0 +1,9 @@
+# .gitignore for the dirz-cmd executable subdirectory
+# There should usually only be two things in this directory on your development machine:
+# 1. A main.go file containing the main method of the program
+# 2. A build executable with the same name as the directory that contains it, produced by running `go build` in this directory
+
+
+# Executables
+dirz-cmd.exe
+dirz-cmd

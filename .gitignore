@@ -1,0 +1,7 @@
+
+# Project-level .gitignore for dirz
+
+# IDE and editor artifacts
+*sublime-*
+
+
