@@ -15,7 +15,7 @@ type Context struct {
 
 type Line struct {
 	Indentation int    // increment to "count" the whitespace and infer a directory hierarchy
-	IsDirectory bool   // false implies a file?
+	Directory   bool   // false implies a file?
 	Characters  []rune // a slice of characters
 	LineNumber  int
 }
@@ -51,7 +51,7 @@ func ParseFile(path string) Context {
 
 func ParseLine(line string, lineNumber int) Line {
 
-	var parsed = Line{Indentation: 0, IsDirectory: false, Characters: nil, LineNumber: lineNumber}
+	var parsed = Line{Indentation: 0, Directory: false, Characters: nil, LineNumber: lineNumber}
 	var nonWhitespaceScanned = false
 	var chars []rune
 	var leadingWhitespace = 0
@@ -68,6 +68,7 @@ func ParseLine(line string, lineNumber int) Line {
 
 	parsed.Characters = chars
 	parsed.Indentation = leadingWhitespace
+	parsed.Directory
 	fmt.Println(parsed)
 
 	return parsed
