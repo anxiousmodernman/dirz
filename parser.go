@@ -2,10 +2,13 @@ package dirz
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 )
+
+const dir = '/'
 
 type Context struct {
 	Lines        []Line
@@ -59,7 +62,7 @@ func ParseLine(line string, lineNumber int) Line {
 	for _, runeValue := range line {
 		chars = append(chars, runeValue)
 
-		if ws := IsWhitespace(runeValue); ws == true && !nonWhitespaceScanned {
+		if ws := isWhitespace(runeValue); ws == true && !nonWhitespaceScanned {
 			leadingWhitespace += 1
 		} else {
 			nonWhitespaceScanned = true
@@ -68,14 +71,28 @@ func ParseLine(line string, lineNumber int) Line {
 
 	parsed.Characters = chars
 	parsed.Indentation = leadingWhitespace
-	parsed.Directory
+	parsed.Directory, _ = hasDirectory(parsed)
 	fmt.Println(parsed)
 
 	return parsed
 
 }
 
-func IsWhitespace(r rune) bool {
+func hasDirectory(line Line) (bool, error) {
+	var dirIndex int
+	var dirSeen = false
+	for _, char := range line.Characters {
+		if char == dir {
+			if dirSeen == true {
+				log.Fatal("Parse error. Multiple \"/\" directory identifiers found on line ", line.LineNumber)
+				return true, errors.New("Parse error")
+			}
+
+		}
+	}
+}
+
+func isWhitespace(r rune) bool {
 
 	result := false
 

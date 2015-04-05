@@ -19,3 +19,5 @@ TODO: outline a strategy similar to [what Katrina Owen recommends on the Splice 
 
 - [Strings, runes, and bytes in Go](https://blog.golang.org/strings)
 - [Text normalization in Go](https://blog.golang.org/normalization)
+- [Error handling in Go](http://blog.golang.org/error-handling-and-go)
+- [Documentation on scanner package](http://golang.org/pkg/text/scanner/)
