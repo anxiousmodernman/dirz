@@ -3,18 +3,17 @@ package iniparser
 import ("errors"
         "bytes")
 
-const parserState (
+const (
+    // state flags
     NULL uint = 0
-    IN_ESCAPED = uint 1
+    IN_ESCAPED uint = 1
     IN_SECTION uint = 2
     IN_SECTION_NAME uint = 4
     IN_KEY uint = 8
     IN_VAL uint = 16
     NEWLINE uint = 32
-)
-
-const ParseChars (
-    SECTION_NAME_START uint = iota
+    // special chars
+    SECTION_NAME_START uint = 33 << iota
     SECTION_NAME_END uint
     KV_DELINEATOR uint
     LINE_BREAK uint
@@ -22,11 +21,11 @@ const ParseChars (
 )
 
 var iniChars = map[byte]uint {
-    '"': ESCAPE_DELINEATOR
-    '[': SECTION_NAME_START
-    ']': SECTION_NAME_END
-    '=': KV_DELINEATOR
-    '\n': LINE_BREAK
+    '"': ESCAPE_DELINEATOR,
+    '[': SECTION_NAME_START,
+    ']': SECTION_NAME_END,
+    '=': KV_DELINEATOR,
+    '\n': LINE_BREAK,
 }
 
 type Section struct {
@@ -63,7 +62,7 @@ const NotInBodyError error = errors.New("Parsing error: Not in section body")
 
 type Section struct {
     name string
-    values map[string][string]
+    values map[string]string
 }
 
 type Parser struct {
@@ -76,7 +75,7 @@ type Parser struct {
     currKey string
 }
 
-func (buffer *bytes.Buffer) Dump string {
+func (buffer *bytes.Buffer) Dump (string) {
     s := buffer.String()
     buffer.Reset()
     return s
@@ -235,10 +234,10 @@ func (parser *Parser) newLine () {
 
 
 var dispatchMap = map[uint]stateChange {
-    SECTION_NAME_START: startSectionName
-    SECTION_NAME_END: endSectionName
-    ESCAPE_DELINEATOR: toggleEscape
-    LINE_BREAK: newLine
+    SECTION_NAME_START: startSectionName,
+    SECTION_NAME_END: endSectionName,
+    ESCAPE_DELINEATOR: toggleEscape,
+    LINE_BREAK: newLine,
 }
 
 func (parser *Parser) ParseToken (chr byte) {
