@@ -1,7 +1,9 @@
 package iniparser
 
-import ("errors"
-        "bytes")
+import ("bytes"
+        "errors"
+        "fmt"
+    )
 
 const (
     // state flags
@@ -255,12 +257,23 @@ func (parser *Parser) ParseToken (chr byte) {
    }
 }
 
+func (parser Parser) ReportError (chr byte) {
+    fmtStr := "Error encountered while parsing character"
+    fmtStr += " %c at index %d.\nThe error was: %s"
+    fmt.Printf(fmtStr, chr, parser.charIdx, parser.err)
+}
+
+func (parser Parser) ReportFullError (chr byte) {
+    parser.ReportError(chr)
+    fmtStr := "Full parser details:\n%+v"
+    fmt.Printf(fmtStr, parser)
+
 func (parser *Parser) ParseString (str []byte) {
     for idx, chr := range str {
+        parser.charIdx = idx
+        parser.ParseToken(chr)
         if parser.err == nil {
-            parser.charIdx = idx
-            parser.ParseToken(chr)
+            parser.ReportError(chr)
         }
     }
 }
-
