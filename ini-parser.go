@@ -234,14 +234,6 @@ func (parser *Parser) newLine () {
     }
 }
 
-
-var dispatchMap = map[uint]stateChange {
-    SECTION_NAME_START: startSectionName,
-    SECTION_NAME_END: endSectionName,
-    ESCAPE_DELINEATOR: toggleEscape,
-    LINE_BREAK: newLine,
-}
-
 func (parser *Parser) ParseToken (chr byte) {
     switch {
         case chr == SECTION_NAME_START:
