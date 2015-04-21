@@ -267,6 +267,7 @@ func (parser Parser) ReportFullError (chr byte) {
     parser.ReportError(chr)
     fmtStr := "Full parser details:\n%+v"
     fmt.Printf(fmtStr, parser)
+}
 
 func (parser *Parser) ParseString (str []byte) {
     for idx, chr := range str {
