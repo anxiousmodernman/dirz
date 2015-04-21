@@ -58,24 +58,6 @@ func (state *State) Reset () {
     state = NULL
 }
 
-func inSection (state *uint) bool {
-    if state.HasFlag(IN_SECTION) {
-        return true
-    } else {
-        state.Reset()
-        return false
-    }
-}
-
-func inSectionName (state *uint) bool {
-    if state.HasFlag(IN_SECTION_NAME) {
-        state.Reset()
-        return true
-    } else {
-        return false
-    }
-}
-
 const NotInSectionError error = errors.New("Parsing error: Not in section")
 const NotInBodyError error = errors.New("Parsing error: Not in section body")
 
@@ -85,246 +67,168 @@ type Section struct {
 }
 
 type Parser struct {
-    text bytes.Buffer
     charIdx uint64
     state State
-    results map[bytes.Buffer]Section
+    results map[string]Section
     err error
     buffer bytes.Buffer
+    currSection string
+    currKey string
 }
 
-func (parser *Parser) startSection () {
-    state = parser.state
-    switch {
-        case state.HasFlag(IN_ESCAPED) {
-            return state, nil
-        }
-        case state.HasFlag(IN_SECTION) {
-            state.Reset()
-            return state, errors.New("Parsing error: Already in section")
-        }
-        case inSectionName(state) {
-            return state, NotInBodyError
-        }
-        default {
-            state.AddFlag(IN_SECTION)
-            return state, nil
-        }
+func (buffer *bytes.Buffer) Dump string {
+    s := buffer.String()
+    buffer.Reset()
+    return s
+}
+
+func (parser *Parser) notInSection (err error) {
+    state := parser.state
+    if !state.HasFlag(IN_SECTION) {
+        state.Reset()
+        parser.err = err
     }
 }
 
-func (parser *Parser) endSection () {
-    state = parser.state
-    switch {
-        case state.HasFlag(IN_ESCAPED) {
-            return state, nil
-        }
-        case !inSection(state) {
-            return state, NotInSectionError
-        }
-        case inSectionName(state) {
-            return state, NotInBodyError
-        }
-        default {
-            state.RemoveFlag(IN_SECTION)
-            return state, nil
-        }
+func (parser *Parser) inSectionName (err error) {
+    state := parser.state
+    if state.HasFlag(IN_SECTION_NAME) {
+        state.Reset()
+        parser.err = err
     }
 }
 
 func (parser *Parser) startSectionName () {
-    state = parser.State
-    switch {
-        case state.HasFlag(IN_ESCAPED) {
-            return state, nil
-        }
-        case !inSection(state) {
-            return state, NotInSectionError
-        }
-        case inSectionName(state) {
-            return state, errors.New("Parsing error: Already in section name")
-        }
-        default {
-            state.AddFlag(IN_SECTION_NAME)
-            return state, nil
-        }
+    state := parser.state
+    parser.notInSection(NotInSectionError)
+    parser.inSectionName(errors.New("Parsing error: Already in section name"))
+    if parser.err == nil && !state.HasFlag(IN_ESCAPED) {
+        state.AddFlag(IN_SECTION)
+        state.AddFlag(IN_SECTION_NAME)
     }
 }
 
 func (parser *Parser) endSectionName () {
-    state = parser.State
-    buffer = parser.buffer
-    results = parser.results
-    switch {
-        case state.HasFlag(IN_ESCAPED) {
-            // ???
-        }
-        case !inSection(state) {
-            return state, NotInSectionError
-        }
-        case !state.HasFlag(IN_SECTION_NAME) {
+    state := parser.state
+    buffer := parser.buffer
+    results := parser.results
+    parser.notInSection(NotInSectionError)
+    if parser.err == nil {
+        if !state.HasFlag(IN_SECTION_NAME) {
             state.Reset()
-            return state, errors.New("Parsing error: Not in section name")
-        }
-        default {
+            parser.err = errors.New("Parsing error: Not in section name")
+        } else if !state.HasFlag(IN_ESCAPED) {
             state.RemoveFlag(IN_SECTION_NAME)
-            s := buffer.String()
+            s := buffer.Dump()
             results[s] = new(Section)
-            buffer.Reset()
-            return state, nil
+            parser.currSection = s
         }
     }
 }
 
-func toggleEscape (state *State) (state *State, err error) {
-    switch {
-        case !inSection(state) {
-            return state, NotInSectionError
-        }
-        case state.HasFlag(IN_ESCAPED) {
+func (parser *Parser) toggleEscape () {
+    parser.notInSection(NotInSectionError)
+    if parser.err == nil {
+        state := parser.state
+        if state.HasFlag(IN_ESCAPED) {
             state.RemoveFlag(IN_ESCAPED)
-            return state, nil
-        }
-        default {
+        } else {
             state.AddFlag(IN_ESCAPED)
-            return state, nil
         }
     }
 }
 
-func startKey (state *State) (state *State, err error) {
-    switch {
-        case state.HasFlag(IN_ESCAPED) {
-            return state, nil
-        }
-        case inSectionName(state) {
-            return state, NotInBodyError
-        }
-        case !inSection(state) {
-            return state, errors.New("Parsing error: Not in section")
-        }
-        case state.HasFlag(IN_KEY) {
+func (parser *Parser) startKey () {
+    parser.notInSection(NotInSectionError)
+    parser.inSectionName(NotInBodyError)
+    if parser.err == nil && !state.HasFlag(IN_ESCAPED) {
+        if state.HasFlag(IN_KEY) {
             state.Reset()
             return state, errors.New("Parsing error: Already in key")
-        }
-        default {
+        } else {
             state.AddFlag(IN_KEY)
-            return state, nil
         }
     }
 }
 
 func endKey (state *State) (state *State, err error) {
-    switch {
-        case state.HasFlag(IN_ESCAPED) {
-            return state, nil
-        }
-        case inSectionName(state) {
-            return state, NotInBodyError
-        }
-        case !inSection(state) {
-            return state, NotInSectionError
-        }
-        case state.HasFlag(IN_KEY) {
+    parser.notInSection(NotInSectionError)
+    parser.inSectionName(NotInBodyError)
+    if parser.err == nil && !state.HasFlag(IN_ESCAPED) {
+        state := parser.state
+        buffer := parser.buffer
+        if state.HasFlag(IN_KEY) {
             state.RemoveFlag(IN_KEY)
-            return state, nil
-        }
-        default {
+            parser.currKey = buffer.Dump()
+        } else {
             state.Reset()
-            return state, errors.New("Parsing error: Not in key")
+            parser.err = errors.New("Parsing error: Not in key")
         }
     }
 }
 
-func startVal (state *State) (state *State, err error) {
-    switch {
-        case state.HasFlag(IN_ESCAPED) {
-            return state, nil
-        }
-        case !inSection(state) {
-            return state, NotInSectionError
-        }
-        case inSectionName(state) {
-            return state, NotInBodyError
-        }
-        case state.HasFlag(IN_VAL) {
-            state.Reset()
-            return state, errors.New("Parsing error: Already in value")
-        }
-        case state.HasFlag(IN_KEY) {
-            state.Reset()
-            return state, errors.New("Parsing error: In key")
-        }
-        default {
-            state.AddFlag(IN_VAL)
-            return state, nil
+func (parser *Parser) startVal () {
+    parser.notInSection(NotInSectionError)
+    parser.inSectionName(NotInBodyError)
+    if parser.err == nil && !state.HasFlag(IN_ESCAPED) {
+        state = parser.state
+        switch {
+            case state.HasFlag(IN_VAL):
+                state.Reset()
+                parser.err = errors.New("Parsing error: Already in value")
+            case state.HasFlag(IN_KEY):
+                state.Reset()
+                parser.err = errors.New("Parsing error: In key")
+            default:
+                state.AddFlag(IN_VAL)
         }
     }
 }
 
-func endVal (state *State) (state *State, err error) {
-    switch {
-        case state.HasFlag(IN_ESCAPED) {
-            return state, nil
-        }
-        case !inSection(state) {
-            return state, NotInSectionError
-        }
-        case state.HasFlag(IN_SECTION_NAME) {
-            state.Reset()
-            return state, NotInBodyError
-        }
-        case !state.HasFlag(IN_VAL) {
+func (parser *Parser) endVal () {
+    parser.notInSection(NotInSectionError)
+    parser.inSectionName(NotInBodyError)
+    if parser.err == nil && !state.HasFlag(IN_ESCAPED) {
+        state := parser.state
+        buffer := parser.buffer
+        results := parser.results
+        if !state.HasFlag(IN_VAL) {
             state.Reset()
             return state, errors.New("Parsing error: Not in value")
-        }
-        // don't need to check for state.HasFlag(IN_KEY)
-        default {
+        } else {
             state.RemoveFlag(IN_VAL)
-            return state, nil
+            section, ok := parser.results[parser.currSection]
+            if !ok {
+                // fill in empty Section
+                section.name = parser.currSection
+                // add it to results
+                results[parser.currSection] = section
+            }
+            section.values[parser.currKey] = buffer.Dump()
+            parser.currKey = ""
         }
     }
 }
 
-func newLine (state *State) (state *State, err error) {
+func (parser *Parser) newLine () {
     seqError := errors.New("Parsing error: Illegal sequence")
-    switch {
-        case !inSection(state) {
-            return state, NotInSectionError
-        }
+    parser.notInSection(NotInSectionError)
+    parser.inSectionName(NotInBodyError)
+    if parser.err == nil {
         // this means multiline string literals
         // do we want that?
-        case state.HasFlag(IN_ESCAPED) {
-            return state, nil
-        }
-        case state.HasFlag(NEWLINE) {
-            state.RemoveFlag(NEWLINE)
-            state.RemoveFlag(IN_SECTION)
-            return state, nil
-        }
-        case state.HasFlag(IN_SECTION_NAME) {
-            state.Reset()
-            return state, seqError
-        }
-        /* the next case validates section contents formatted as:
-           [sectionName]
-           keyName=valName
-           
-           if we want lists in addition to/instead of maps, this
-           should be 
-           case state.HasFlag(IN_KEY) {
-               state.RemoveFlag(IN_KEY)
-               return state, seqError
-           }
-        */
-        case state.HasFlag(IN_KEY) {
-            state.Reset()
-            return state, seqError
-        }
-        case state.HasFlag(IN_VAL) {
-            state.RemoveFlag(IN_VAL)
-            state.AddFlag(NEWLINE)
-            return state, nil
+        if !state.HasFlag(IN_ESCAPED) {
+            switch {
+                case state.HasFlag(NEWLINE):
+                    state.RemoveFlag(NEWLINE)
+                    state.RemoveFlag(IN_SECTION)
+                case state.HasFlag(IN_KEY):
+                    state.Reset()
+                    parser.err = seqError
+                case state.HasFlag(IN_VAL):
+                    state.AddFlag(NEWLINE)
+                    parser.endVal()
+            }
         }
     }
 }
@@ -337,19 +241,27 @@ var dispatchMap = map[uint]stateChange {
     LINE_BREAK: newLine
 }
 
-func (parser *Parser) parseToken (chr byte) {
-    state = *parser.state
-    results = *parser.results
-    f, ok := dispatchMap[chr]
-    if ok {
-        _, err := f(state)
-        if err != nil {
-            parser.err = err
+func (parser *Parser) ParseToken (chr byte) {
+    switch {
+        case chr == SECTION_NAME_START:
+            parser.startSectionName()
+        case chr == SECTION_NAME_END:
+            parser.endSectionName()
+        case chr == LINE_BREAK:
+            parser.newLine()
+        case chr == ESCAPE_DELINEATOR:
+            parser.toggleEscape()
+        default:
+            parser.buffer.WriteByte(chr)
+   }
+}
+
+func (parser *Parser) ParseString (str []byte) {
+    for idx, chr := range str {
+        if parser.err == nil {
+            parser.charIdx = idx
+            parser.ParseToken(chr)
         }
-    } else {
-        switch {
-            case state.HasFlag(IN_SECTION_NAME) {
-               secName 
-
-
+    }
+}
 
