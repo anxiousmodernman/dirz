@@ -265,8 +265,9 @@ func (parser *Parser) ParseString (str []byte) {
     for idx, chr := range str {
         parser.charIdx = idx
         parser.ParseToken(chr)
-        if parser.err == nil {
+        if parser.err != nil {
             parser.ReportError(chr)
+            break
         }
     }
 }
