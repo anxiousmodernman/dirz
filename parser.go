@@ -6,26 +6,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"unicode/utf8"
 )
 
 const dir = '/'
-
-type Context struct {
-	Lines        []Line
-	LineCount    int
-	CurrentIndex int
-}
-
-type Line struct {
-	Indentation int    // increment to "count" the whitespace and infer a directory hierarchy
-	Directory   bool   // false implies a file?
-	Characters  []rune // a slice of characters
-	LineNumber  int
-}
-
-// func (line *Line) HasTemplate() bool {
-
-// }
 
 func ParseFile(path string) Context {
 
@@ -37,13 +21,19 @@ func ParseFile(path string) Context {
 
 	var lines = 0
 	var ctx = Context{nil, lines, 0}
-	var parsedLines []Line
+	//var parsedLines []Line
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		lines += 1
-		parsed := ParseLine(scanner.Text(), lines)
-		parsedLines = append(parsedLines, parsed)
+		b := scanner.Bytes()
+		r, _ := utf8.DecodeRune(b)
+		if isWhitespace(r) {
+			fmt.Println("some whitespace here", "bytes:", b, "rune:", r, "bytes len", len(b))
+
+		}
+		// parsed := ParseLine(scanner.Text(), lines)
+		// parsedLines = append(parsedLines, parsed)
 	}
 
 	ctx.LineCount = lines
@@ -79,7 +69,7 @@ func ParseLine(line string, lineNumber int) Line {
 }
 
 func hasDirectory(line Line) (bool, error) {
-	var dirIndex int
+	//var dirIndex int
 	var dirSeen = false
 	for _, char := range line.Characters {
 		if char == dir {
@@ -90,6 +80,7 @@ func hasDirectory(line Line) (bool, error) {
 
 		}
 	}
+	return false, nil
 }
 
 func isWhitespace(r rune) bool {
