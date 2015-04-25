@@ -1,8 +1,8 @@
 package lexer
 
 import (
-	"github.com/adampresley/sample-ini-parser/services/lexer/lexer"
-	"github.com/adampresley/sample-ini-parser/services/lexer/lexertoken"
+	"github.com/anxiousmodernman/dirz/lexer"
+	"github.com/anxiousmodernman/dirz/token"
 )
 
 /*
