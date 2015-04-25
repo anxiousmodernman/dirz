@@ -7,8 +7,11 @@ import (
 func LexSpace(lexer *Lexer) LexFn {
 	for {
 		if lexer.IsWhitespace() {
-			lexer.Inc()
 			lexer.Emit(token.SPACE)
+		}
+
+		if strings.HasPrefix(lexer.InputToEnd(), token.SLASH) {
+			return LexSlash
 		}
 
 		lexer.Inc()
