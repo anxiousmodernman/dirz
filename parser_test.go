@@ -1,18 +1,15 @@
 package dirz
 
-import "testing"
+import (
+	"github.com/anxiousmodernman/dirz/model"
+	"github.com/anxiousmodernman/dirz/parser"
+	"testing"
+)
 
 func TestParseSingleFile(t *testing.T) {
 	var filename = "./testfiles/touch-these-files.dirz"
 
-	// file should be all like
-	// /level0
-	//   file1
-	//   filt2
-	//   file3
-
-	var ctx Context
-	ctx = ParseFile(filename)
+	ctx := parser.Parse(filename)
 
 	if ctx.LineCount != 4 {
 		t.Fail()

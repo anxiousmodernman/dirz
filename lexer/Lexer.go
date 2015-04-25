@@ -5,7 +5,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/adampresley/sample-ini-parser/services/lexer/lexertoken"
+	"github.com/anxiousmodernman/dirz/token"
 )
 
 /*
@@ -18,7 +18,7 @@ http://cuddle.googlecode.com/hg/talk/lex.html#landing-slide
 type Lexer struct {
 	Name   string
 	Input  string
-	Tokens chan lexertoken.Token
+	Tokens chan token.Token
 	State  LexFn
 
 	Start int
@@ -52,8 +52,8 @@ func (this *Lexer) Dec() {
 Puts a token onto the token channel. The value of this token is
 read from the input based on the current lexer position.
 */
-func (this *Lexer) Emit(tokenType lexertoken.TokenType) {
-	this.Tokens <- lexertoken.Token{Type: tokenType, Value: this.Input[this.Start:this.Pos]}
+func (this *Lexer) Emit(tokenType token.TokenType) {
+	this.Tokens <- token.Token{Type: tokenType, Value: this.Input[this.Start:this.Pos]}
 	this.Start = this.Pos
 }
 
@@ -61,8 +61,8 @@ func (this *Lexer) Emit(tokenType lexertoken.TokenType) {
 Returns a token with error information.
 */
 func (this *Lexer) Errorf(format string, args ...interface{}) LexFn {
-	this.Tokens <- lexertoken.Token{
-		Type:  lexertoken.TOKEN_ERROR,
+	this.Tokens <- token.Token{
+		Type:  token.TOKEN_ERROR,
 		Value: fmt.Sprintf(format, args...),
 	}
 
@@ -83,7 +83,7 @@ Increment the position
 func (this *Lexer) Inc() {
 	this.Pos++
 	if this.Pos >= utf8.RuneCountInString(this.Input) {
-		this.Emit(lexertoken.TOKEN_EOF)
+		this.Emit(token.TOKEN_EOF)
 	}
 }
 
@@ -118,7 +118,7 @@ and advances the lexer position.
 func (this *Lexer) Next() rune {
 	if this.Pos >= utf8.RuneCountInString(this.Input) {
 		this.Width = 0
-		return lexertoken.EOF
+		return token.EOF
 	}
 
 	// get the next run from a string, starting at this.Pos
@@ -132,7 +132,7 @@ func (this *Lexer) Next() rune {
 /*
 Return the next token from the channel
 */
-func (this *Lexer) NextToken() lexertoken.Token {
+func (this *Lexer) NextToken() token.Token {
 	for {
 		select {
 		// either take a token off the channel...
@@ -189,8 +189,8 @@ func (this *Lexer) SkipWhitespace() {
 			break
 		}
 
-		if ch == lexertoken.EOF {
-			this.Emit(lexertoken.TOKEN_EOF)
+		if ch == token.EOF {
+			this.Emit(token.TOKEN_EOF)
 			break
 		}
 	}

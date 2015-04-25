@@ -1,7 +1,6 @@
-package dirz
+package model
 
 type DirzContext struct {
-	Lines        []Line
-	LineCount    int
-	CurrentIndex int
+	Lines     []Line
+	LineCount int
 }

@@ -1,9 +1,14 @@
 package parser
 
 import (
-	"ioutil"
+	"io/ioutil"
 	"log"
 	"strings"
+
+	"github.com/adampresley/sample-ini-parser/model/ini"
+	"github.com/adampresley/sample-ini-parser/services/lexer/lexertoken"
+	"github.com/anxiousmodernman/dirz/lexer"
+	"github.com/anxiousmodernman/dirz/model"
 )
 
 func isEOF(token lexertoken.Token) bool {
