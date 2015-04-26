@@ -11,6 +11,7 @@ const (
 	TOKEN_SLASH
 	TOKEN_SPACE
 	TOKEN_NAME
+	TOKEN_DIRECTORY_NAME
 )
 
 type Token struct {

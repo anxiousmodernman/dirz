@@ -53,6 +53,7 @@ Puts a token onto the token channel. The value of this token is
 read from the input based on the current lexer position.
 */
 func (this *Lexer) Emit(tokenType token.TokenType) {
+	fmt.Println("emitting this", this.Input[this.Start:this.Pos])
 	this.Tokens <- token.Token{Type: tokenType, Value: this.Input[this.Start:this.Pos]}
 	this.Start = this.Pos
 }
