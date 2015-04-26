@@ -1,8 +1,8 @@
 package parser
 
 import (
+	"fmt"
 	"io/ioutil"
-	"log"
 	"strings"
 
 	"github.com/anxiousmodernman/dirz/lexer"
@@ -10,40 +10,41 @@ import (
 	"github.com/anxiousmodernman/dirz/token"
 )
 
-func isEOF(token token.Token) bool {
-	return token.Type == token.TOKEN_EOF
+func isEOF(theToken token.Token) bool {
+	return theToken.Type == token.TOKEN_EOF
 }
 
-func Parse(fileName, input string) model.DirzContext {
+func Parse(fileName string) model.DirzContext {
 
+	fileContents := readFileToString(fileName)
 	var token token.Token
 	var tokenValue string
 
-	output := model.DirzContext{}
+	output := model.DirzContext{LineCount: 0}
 
-	log.Println("Starting lexer and parser for file", fileName, "...")
+	fmt.Println("Starting lexer and parser for file", fileName, "...")
 
 	// in LexerFactory.go; returns *Lexer
-	l := lexer.BeginLexing(fileName, input)
+	l := lexer.BeginLexing(fileName, fileContents)
 	// start Run() loop in goroutine
 	// first method call is LexBegin, returns a StateFn,
 	// repeatedly calls StateFn that return StateFn like this:
 	//   state = state(this)
 	// the state functions will do their thing and asynchronously put tokens on a chan of Token
-	go l.Run()
+	// go l.Run()
 
 	for {
-		token = l.NextToken()
+		theToken = l.NextToken()
 
-		if token.Type != token.TOKEN_VALUE {
+		if theToken.Type != token.TOKEN_VALUE {
 			tokenValue = strings.TrimSpace(token.Value)
 		} else {
 			tokenValue = token.Value
 		}
 
-		if isEOF(token) {
+		if isEOF(theToken) {
 			// if hasSection == true {
-			// 	log.Println("Adding section '", section.Name, "' to output...")
+			// 	fmt.Println("Adding section '", section.Name, "' to output...")
 			// 	output.Sections = append(output.Sections, section)
 			// }
 
@@ -56,7 +57,7 @@ func Parse(fileName, input string) model.DirzContext {
 		// 	 * Reset tracking variables
 		// 	 */
 		// 	if hasSection == true {
-		// 		log.Println("Adding section '", section.Name, "' to output...")
+		// 		fmt.Println("Adding section '", section.Name, "' to output...")
 		// 		output.Sections = append(output.Sections, section)
 		// 	}
 
@@ -66,21 +67,21 @@ func Parse(fileName, input string) model.DirzContext {
 		// 	section.Name = tokenValue
 		// 	section.KeyValuePairs = make([]ini.IniKeyValue, 0)
 
-		// 	log.Println("Section", section.Name, "started...")
+		// 	fmt.Println("Section", section.Name, "started...")
 
 		// case token.TOKEN_KEY:
 		// 	key = tokenValue
-		// 	log.Println("Key:", key)
+		// 	fmt.Println("Key:", key)
 
 		// case token.TOKEN_VALUE:
-		// 	log.Println("Value:", tokenValue)
+		// 	fmt.Println("Value:", tokenValue)
 
 		// 	section.KeyValuePairs = append(section.KeyValuePairs, ini.IniKeyValue{Key: key, Value: tokenValue})
 		// 	key = ""
 		// }
 	}
 
-	log.Println("Parser has been shutdown")
+	fmt.Println("Parser has been shutdown")
 	return output
 }
 
