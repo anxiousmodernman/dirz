@@ -2,7 +2,7 @@ package main
 
 import (
 	// "fmt"
-	dirz "github.com/anxiousmodernman/dirz"
+	dirz "github.com/anxiousmodernman/dirz/parser"
 )
 
 func main() {

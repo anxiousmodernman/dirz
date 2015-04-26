@@ -1,7 +1,6 @@
 package dirz
 
 import (
-	"github.com/anxiousmodernman/dirz/model"
 	"github.com/anxiousmodernman/dirz/parser"
 	"testing"
 )
