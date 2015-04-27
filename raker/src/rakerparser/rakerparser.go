@@ -1,37 +1,53 @@
-package iniparser
+package rakerparser
 
-import "inilexer"
+import (
+    "rakerlexer"
+    "path/filepath"
+)
 
-type DirectoryMap map[string]Directory
+type DirectorySlice []Directory
 
 type Directory struct {
     name string
     parentDirectory *Directory
-    children DirectoryMap
+    children DirectorySlice
 }
 
 func (directory *Directory) AddSubDirectory (subDir *Directory) {
     *subDir.parentDirectory = *directory
-    directory.children[subDir.name] = *subDir
+    directory.children = append(directory.children, *subDir)
+}
+
+func (directory Directory) GetPath () (path string) {
+    parents := []string{}
+    for {
+        parent := directory.parentDirectory
+        if parent == nil {
+            break
+        } else {
+            parents = append(parents, parent.name)
+        }
+    }
+    return filepath.Join(parents...)
 }
 
 func NewDirectory(dirName string) (newDir Directory) {
-    newDir = Directory{dirName, nil, make(DirectoryMap)}
+    newDir = Directory{dirName, nil, DirectorySlice{}}
     return newDir
 }
 
 type Parser struct {
-    directoryTree *Directory
+    DirectoryTree *Directory
     topDirs []*Directory
-    tokens chan inilexer.Token
+    tokens chan rakerlexer.Token
+    Done chan bool
     maxTabs uint
     tabCount uint
 }
 
-func NewParser (rootDirName string) (newParser Parser) {
+func NewParser (rootDirName string, tokens chan rakerlexer.Token) (newParser Parser) {
     rootDir := NewDirectory(rootDirName)
-    return Parser{&rootDir, []*Directory{&rootDir},
-                  make(chan inilexer.Token), 0, 0}
+    return Parser{&rootDir, []*Directory{&rootDir}, tokens, make(chan bool), 0, 0}
 }
 
 func (parser *Parser) PopDir () {
@@ -52,6 +68,7 @@ func (parser *Parser) StopParsing () {
     for (len(parser.topDirs) > 0) {
         parser.PopDir()
     }
+    parser.Done <- true
 }
 
 func (parser *Parser) ParseTab () {
@@ -69,13 +86,13 @@ func (parser *Parser) ParseName (dirName string) {
     parser.tabCount = 0
 }
 
-func (parser *Parser) ParseToken(token inilexer.Token) {
+func (parser *Parser) ParseToken(token rakerlexer.Token) {
     switch {
-        case token.TokenType == inilexer.TAB:
+        case token.TokenType == rakerlexer.TAB:
                 parser.ParseTab()
-        case token.TokenType == inilexer.DIRECTORY_NAME:
+        case token.TokenType == rakerlexer.DIRECTORY_NAME:
                 parser.ParseName(token.Content)
-        case token.TokenType == inilexer.EOF:
+        case token.TokenType == rakerlexer.EOF:
                 parser.StopParsing()
         }
 }
@@ -84,7 +101,7 @@ func (parser *Parser) StartParsing () {
     Parse:
         for {
             token := <-parser.tokens
-            if (token.TokenType == inilexer.ERROR) {
+            if (token.TokenType == rakerlexer.ERROR) {
                 break Parse
             } else {
                 parser.ParseToken(token)

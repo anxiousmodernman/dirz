@@ -1,4 +1,4 @@
-package iniparser
+package rakerparser
 
 import (
     "fmt"
@@ -14,7 +14,7 @@ func (directory Directory) MakeDirectory (curPath string) {
     }
 }
 
-func (directory Directory) toString (s []byte, tabCount int) string {
+func (directory Directory) toString (s []byte, tabCount int) (out string) {
     dirName := fmt.Sprintf("%s/\n", directory.name)
     line := []byte{}
     for i := 0; i < tabCount; i++ {
@@ -26,9 +26,10 @@ func (directory Directory) toString (s []byte, tabCount int) string {
     for _, dir := range directory.children {
         dir.toString(s, tc)
     }
-    return string(s)
+    out = string(s)
+    return out
 }
 
-
-
-
+func (directory Directory) String () string {
+    return directory.toString([]byte{}, 0)
+}

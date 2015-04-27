@@ -1,6 +1,10 @@
-package inilexer
+package rakerlexer
 
-import "bytes"
+import (
+    "bytes"
+    "io"
+    "unicode"
+)
 
 type TokenType uint8
 
@@ -14,6 +18,7 @@ const (
     LINE_BREAK rune = '\n'
     ESCAPE_DELINEATOR rune = '"'
     SLASH rune = '/'
+    REPLACEMENT_CHAR rune = unicode.ReplacementChar
     // token types
     ERROR TokenType = 0
     TAB TokenType = 1
@@ -51,7 +56,7 @@ type Lexer struct {
     whitespaceCount uint8
     state State
     output chan Token
-    buffer bytes.Buffer
+    buffer *bytes.Buffer
 }
 
 func (lexer *Lexer) EmitError () {
@@ -113,31 +118,37 @@ func (lexer *Lexer) ParseToken (chr rune) {
             lexer.NewLine()
         case chr == ESCAPE_DELINEATOR:
             lexer.ToggleEscape()
+        // returned when io.RuneReader can't read rune
+        case chr == REPLACEMENT_CHAR:
+            lexer.EmitError()
         default:
             lexer.buffer.WriteRune(chr)
     }
 }
 
-func (lexer *Lexer) ParseString (str []rune) {
+func (lexer *Lexer) ParseString (rdr io.RuneReader) {
     lexer.state.RemoveFlag(STOPPED)
+    idx := 0
     Parse:
-        for idx, chr := range str {
+        for {
             if (lexer.state.HasFlag(STOPPED) || lexer.state.HasFlag(IN_ERROR)) {
                 break Parse
             } else {
+                chr, _, _ := rdr.ReadRune()
                 lexer.charIdx = idx
                 lexer.ParseToken(chr)
+                idx++
             }
         }
     lexer.Emit(Token{EOF, ""})
 }
 
-func NewLexer() (l Lexer) {
+func NewLexer(tokens chan Token) (l Lexer) {
     l = Lexer{
             charIdx: 0,
             state: State(STOPPED),
-            output: make(chan Token, 1),
-            buffer: *new(bytes.Buffer),
+            output: tokens,
+            buffer: new(bytes.Buffer),
         }
     return l
 }
