@@ -165,6 +165,7 @@ token channel.
 */
 func (this *Lexer) Run() {
 	for state := LexBegin; state != nil; {
+		_ = "breakpoint"
 		state = state(this)
 	}
 
@@ -182,6 +183,7 @@ func (this *Lexer) Shutdown() {
 Skips whitespace until we get something meaningful.
 */
 func (this *Lexer) SkipWhitespace() {
+	fmt.Println("Skipping meaningless Whitespace")
 	for {
 		ch := this.Next()
 

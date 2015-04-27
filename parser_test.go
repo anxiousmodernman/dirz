@@ -7,7 +7,7 @@ import (
 
 func TestParseSingleFile(t *testing.T) {
 	var filename = "./testfiles/touch-these-files.dirz"
-
+	_ = "breakpoint"
 	ctx := parser.Parse(filename)
 
 	if ctx.LineCount != 4 {

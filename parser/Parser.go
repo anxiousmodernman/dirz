@@ -40,6 +40,7 @@ func Parse(fileName string) model.DirzContext {
 		sequence = append(sequence, theToken)
 
 		if isEOF(theToken) {
+			fmt.Println("Parser encountered EOF")
 			// if hasSection == true {
 			// 	fmt.Println("Adding section '", section.Name, "' to output...")
 			// 	output.Sections = append(output.Sections, section)
