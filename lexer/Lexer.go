@@ -30,6 +30,7 @@ type Lexer struct {
 Backup to the beginning of the last read token.
 */
 func (this *Lexer) Backup() {
+	this.Debug("Backup()")
 	this.Pos -= this.Width
 }
 
@@ -45,7 +46,17 @@ func (this *Lexer) CurrentInput() string {
 Decrement the position
 */
 func (this *Lexer) Dec() {
+	this.Debug("Dec()")
 	this.Pos--
+}
+
+/*
+Print boring debug info. Pass in a useful name for your context, such as
+the name of the calling function.
+*/
+func (this *Lexer) Debug(context string) {
+	fmt.Println("DEBUG: Context:", context, "Pos =", this.Pos, "; Start =",
+		this.Start, "; Width = ", this.Width, "; \n\tInput =", this.InputToEnd())
 }
 
 /*
@@ -53,6 +64,7 @@ Puts a token onto the token channel. The value of this token is
 read from the input based on the current lexer position.
 */
 func (this *Lexer) Emit(tokenType token.TokenType) {
+	this.Debug("Emit()")
 	fmt.Println("emitting this", this.Input[this.Start:this.Pos])
 	this.Tokens <- token.Token{Type: tokenType, Value: this.Input[this.Start:this.Pos]}
 	this.Start = this.Pos
@@ -62,6 +74,7 @@ func (this *Lexer) Emit(tokenType token.TokenType) {
 Returns a token with error information.
 */
 func (this *Lexer) Errorf(format string, args ...interface{}) LexFn {
+	this.Debug("Errorf()")
 	this.Tokens <- token.Token{
 		Type:  token.TOKEN_ERROR,
 		Value: fmt.Sprintf(format, args...),
@@ -75,6 +88,7 @@ Ignores the current token by setting the lexer's start
 position to the current reading position.
 */
 func (this *Lexer) Ignore() {
+	this.Debug("Ignore")
 	this.Start = this.Pos
 }
 
@@ -82,6 +96,7 @@ func (this *Lexer) Ignore() {
 Increment the position
 */
 func (this *Lexer) Inc() {
+	this.Debug("Inc()")
 	this.Pos++
 	if this.Pos >= utf8.RuneCountInString(this.Input) {
 		this.Emit(token.TOKEN_EOF)
@@ -101,6 +116,7 @@ Returns the true/false if the lexer is at the end of the
 input stream.
 */
 func (this *Lexer) IsEOF() bool {
+	this.Debug("IsEOF")
 	return this.Pos >= len(this.Input)
 }
 
@@ -108,6 +124,7 @@ func (this *Lexer) IsEOF() bool {
 Returns true/false if next character is whitespace
 */
 func (this *Lexer) IsWhitespace() bool {
+	this.Debug("IsWhitespace()")
 	ch, _ := utf8.DecodeRuneInString(this.Input[this.Pos:])
 	return unicode.IsSpace(ch)
 }
@@ -117,6 +134,7 @@ Reads the next rune (character) from the input stream
 and advances the lexer position.
 */
 func (this *Lexer) Next() rune {
+	this.Debug("Next()")
 	if this.Pos >= utf8.RuneCountInString(this.Input) {
 		this.Width = 0
 		return token.EOF
@@ -154,6 +172,7 @@ position back. Basically reads the next rune without consuming
 it.
 */
 func (this *Lexer) Peek() rune {
+	this.Debug("Peek()")
 	rune := this.Next()
 	this.Backup()
 	return rune
@@ -165,7 +184,6 @@ token channel.
 */
 func (this *Lexer) Run() {
 	for state := LexBegin; state != nil; {
-		_ = "breakpoint"
 		state = state(this)
 	}
 
@@ -176,6 +194,7 @@ func (this *Lexer) Run() {
 Shuts down the token stream
 */
 func (this *Lexer) Shutdown() {
+	this.Debug("Shutdown")
 	close(this.Tokens)
 }
 
@@ -183,7 +202,7 @@ func (this *Lexer) Shutdown() {
 Skips whitespace until we get something meaningful.
 */
 func (this *Lexer) SkipWhitespace() {
-	fmt.Println("Skipping meaningless Whitespace")
+	this.Debug("SkipWhitespace()")
 	for {
 		ch := this.Next()
 

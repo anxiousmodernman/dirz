@@ -1,4 +1,6 @@
-/level0
+/level0 
+  /level1 
+    /level2
   file1
-  filt2
+  file2
   file3
