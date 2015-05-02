@@ -1,7 +1,8 @@
 package lexer
 
 import (
-	"fmt"
+	// "fmt"
+	// "github.com/anxiousmodernman/dirz/errors"
 	"github.com/anxiousmodernman/dirz/token"
 	"strings"
 )
@@ -16,15 +17,33 @@ func LexDirectory(lexer *Lexer) LexFn {
 		panic("Gotta have a name for that folder, Tex")
 	}
 
+	directoryNameLength := 0
+
 	for {
 
 		if strings.HasPrefix(lexer.InputToEnd(), token.NEWLINE) {
-			fmt.Println("emitting TOKEN_DIRECTORY_NAME")
+			// fmt.Println("emitting TOKEN_DIRECTORY_NAME")
 			lexer.Emit(token.TOKEN_DIRECTORY_NAME)
 
 			return LexNewline
 		}
+		_ = "breakpoint"
+
+		if lexer.IsEOF() {
+
+			if directoryNameLength == 0 {
+				// lexer.Errorf(errors.LEXER_ERROR_UNEXPECTED_EOF)
+				lexer.EmitEOF()
+			} else {
+				lexer.EmitEOF()
+			}
+
+			return nil
+
+		}
 
 		lexer.Inc()
+
+		directoryNameLength++
 	}
 }

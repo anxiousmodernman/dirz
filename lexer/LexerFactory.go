@@ -14,7 +14,7 @@ func BeginLexing(name string, input string) *Lexer {
 		Name:   name,
 		Input:  input,
 		State:  LexBegin,
-		Tokens: make(chan token.Token, 3),
+		Tokens: make(chan token.Token),
 	}
 
 	return l

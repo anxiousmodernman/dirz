@@ -30,7 +30,7 @@ type Lexer struct {
 Backup to the beginning of the last read token.
 */
 func (this *Lexer) Backup() {
-	this.Debug("Backup()")
+	// this.Debug("Backup()")
 	this.Pos -= this.Width
 }
 
@@ -46,7 +46,7 @@ func (this *Lexer) CurrentInput() string {
 Decrement the position
 */
 func (this *Lexer) Dec() {
-	this.Debug("Dec()")
+	// this.Debug("Dec()")
 	this.Pos--
 }
 
@@ -55,8 +55,9 @@ Print boring debug info. Pass in a useful name for your context, such as
 the name of the calling function.
 */
 func (this *Lexer) Debug(context string) {
-	fmt.Println("DEBUG: Context:", context, "Pos =", this.Pos, "; Start =",
-		this.Start, "; Width = ", this.Width, "; \n\tInput =", this.InputToEnd())
+
+	// fmt.Println("DEBUG: Context:", context, "Pos =", this.Pos, "; Start =",
+	// 	this.Start, "; Width = ", this.Width, "; \n\tInput =", this.InputToEnd())
 }
 
 /*
@@ -68,6 +69,16 @@ func (this *Lexer) Emit(tokenType token.TokenType) {
 	fmt.Println("emitting this", this.Input[this.Start:this.Pos])
 	this.Tokens <- token.Token{Type: tokenType, Value: this.Input[this.Start:this.Pos]}
 	this.Start = this.Pos
+}
+
+/*
+A special EmitEOF fucntion is required, because an index out of bounds error occurs when
+accessing a the input string at EOF in regular Emit() function.
+*/
+func (this *Lexer) EmitEOF() {
+	fmt.Println("Emitting EOF")
+	this.Tokens <- token.Token{Type: token.TOKEN_EOF, Value: "EOF"}
+	this.Shutdown()
 }
 
 /*
@@ -99,7 +110,7 @@ func (this *Lexer) Inc() {
 	this.Debug("Inc()")
 	this.Pos++
 	if this.Pos >= utf8.RuneCountInString(this.Input) {
-		this.Emit(token.TOKEN_EOF)
+		this.EmitEOF()
 	}
 }
 
@@ -108,7 +119,11 @@ Return a slice of the input from the current lexer position
 to the end of the input string.
 */
 func (this *Lexer) InputToEnd() string {
-	return this.Input[this.Pos:]
+	if !this.IsEOF() {
+		return this.Input[this.Pos:]
+	} else {
+		return ""
+	}
 }
 
 /*
@@ -187,7 +202,7 @@ func (this *Lexer) Run() {
 		state = state(this)
 	}
 
-	this.Shutdown()
+	// this.Shutdown()
 }
 
 /*

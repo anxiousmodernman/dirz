@@ -7,11 +7,11 @@ import (
 )
 
 func LexSpace(lexer *Lexer) LexFn {
-	fmt.Println("LexSpace called")
+	// fmt.Println("LexSpace called")
 	var nextFn LexFn
 	for {
 		if lexer.IsWhitespace() {
-			fmt.Println("LexSpace: IsWhitespace matched. Start", lexer.Start, "Pos", lexer.Pos, "Width", lexer.Width)
+			// fmt.Println("LexSpace: IsWhitespace matched. Start", lexer.Start, "Pos", lexer.Pos, "Width", lexer.Width)
 			lexer.Pos += len(token.SPACE)
 			lexer.Emit(token.TOKEN_SPACE)
 
