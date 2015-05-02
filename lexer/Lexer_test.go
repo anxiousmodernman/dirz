@@ -16,13 +16,15 @@ func TestLexSingleToken(t *testing.T) {
 	var tokens []token.Token
 
 	for {
+
 		thing := lxr.NextToken()
+		tokens = append(tokens, thing)
+
 		fmt.Println("Token: ", thing.Value)
 		if thing.Type == token.TOKEN_EOF {
 			break
 		}
 
-		tokens = append(tokens, thing)
 	}
 
 	t.Log(tokens)

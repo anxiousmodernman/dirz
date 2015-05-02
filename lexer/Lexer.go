@@ -167,15 +167,10 @@ func (this *Lexer) Next() rune {
 Return the next token from the channel
 */
 func (this *Lexer) NextToken() token.Token {
-	for {
-		select {
-		// either take a token off the channel...
-		case token := <-this.Tokens:
-			return token
-			// ... or CALL the state func and re-set it
-		default:
-			this.State = this.State(this)
-		}
+	select {
+	//take a token off the channel...
+	case token := <-this.Tokens:
+		return token
 	}
 
 	panic("Lexer.NextToken reached an invalid state!!")

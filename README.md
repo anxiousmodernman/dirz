@@ -8,7 +8,7 @@ Initial thoughts are [here](http://coleman.codes/post/language-agnostic-project-
 From the top-level directory
 
 ```
-go test
+go test ./...
 ```
 
 ## Contributing
