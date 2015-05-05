@@ -93,7 +93,7 @@ func Test_LexWithNewlineAsFirstToken(t *testing.T) {
 
 	input :=
 		`
-/first  
+/first
   /second
   file1
   file3
