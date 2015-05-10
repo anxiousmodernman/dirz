@@ -132,3 +132,29 @@ func Test_LexWithNewlineAsFirstToken(t *testing.T) {
 		t.Log("Expected 1 EOF, got ", eof)
 	}
 }
+
+func Test_LexFileWithTemplate(t *testing.T) {
+
+	input :=
+		`/dir
+  file  template.json  
+  file2  template2.json
+`
+	lxr := BeginLexing("testLexer", input)
+	go lxr.Run()
+
+	var tokens []token.Token
+
+	for {
+		thing := lxr.NextToken()
+		tokens = append(tokens, thing)
+		if thing.Type == token.TOKEN_EOF {
+			break
+		}
+	}
+
+	if fileNames := countTokenType(tokens, token.TOKEN_FILE); fileNames != 4 {
+		t.Log("Expected 4 file names got ", fileNames)
+		t.Fail()
+	}
+}
