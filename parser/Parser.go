@@ -9,15 +9,20 @@ import (
 	"github.com/anxiousmodernman/dirz/token"
 )
 
+type Parser struct {
+	Tree               parseTree
+	currentIndentation int
+}
+
 func isEOF(theToken token.Token) bool {
 	return theToken.Type == token.TOKEN_EOF
 }
 
-func Parse(fileName string) model.DirzContext {
+func (this *Parser) Parse(fileName string) parseTree {
 
 	fileContents := readFileToString(fileName)
 	var theToken token.Token
-	output := model.DirzContext{LineCount: 0}
+	output := parseTree
 
 	fmt.Println("Starting lexer and parser for file", fileName, "...")
 

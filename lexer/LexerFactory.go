@@ -10,12 +10,12 @@ instance of the lexer and a channel of tokens. Reading this stream
 is the way to parse a given input and perform processing.
 */
 func BeginLexing(name string, input string) *Lexer {
-	l := &Lexer{
+	lxr := &Lexer{
 		Name:   name,
 		Input:  input,
 		State:  LexBegin,
 		Tokens: make(chan token.Token),
 	}
 
-	return l
+	return lxr
 }
