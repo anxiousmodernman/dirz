@@ -13,6 +13,7 @@ go test ./...
 
 ## Helpful info about Go
 
+- [Stack Exchange Code Review site question about representing a graph in Go](http://codereview.stackexchange.com/questions/62214/graph-adjacency-list-for-bfs-and-dfs-in-golang)
 - [Strings, runes, and bytes in Go](https://blog.golang.org/strings)
 - [Text normalization in Go](https://blog.golang.org/normalization)
 - [Error handling in Go](http://blog.golang.org/error-handling-and-go)

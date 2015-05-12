@@ -3,8 +3,9 @@ package lexer
 import (
 	// "fmt"
 	// "github.com/anxiousmodernman/dirz/errors"
-	"github.com/anxiousmodernman/dirz/token"
 	"strings"
+
+	"github.com/anxiousmodernman/dirz/token"
 )
 
 func LexDirectory(lexer *Lexer) LexFn {
@@ -27,7 +28,6 @@ func LexDirectory(lexer *Lexer) LexFn {
 
 			return LexNewline
 		}
-		_ = "breakpoint"
 
 		if lexer.IsEOF() {
 
