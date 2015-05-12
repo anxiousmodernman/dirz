@@ -3,5 +3,6 @@
 
 # IDE and editor artifacts
 *sublime-*
+*.swp
 
 
