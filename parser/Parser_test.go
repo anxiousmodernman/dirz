@@ -1,6 +1,9 @@
 package parser
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func Test_AddChildTreeItem(t *testing.T) {
 
@@ -21,6 +24,23 @@ func Test_AddChildTreeItem(t *testing.T) {
 	item.AddChild(item2)
 	if length := len(item.children); length != 1 {
 		t.Log("item.children length expected 1, got", length)
+		t.Fail()
+	}
+}
+
+func Test_CreateIndentationStack(t *testing.T) {
+
+	stack := newIndentationStack()
+
+	fmt.Println(stack)
+}
+
+func Test_MakeNextId(t *testing.T) {
+
+	parser := Parser{identity: 1}
+	parser.nextId()
+	if parser.identity != 2 {
+		t.Log("Expected 2, got ", parser.identity)
 		t.Fail()
 	}
 }

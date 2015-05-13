@@ -22,13 +22,14 @@ type treeItem struct {
 }
 
 func (this *treeItem) AddChild(item treeItem) {
+
 	this.children = append(this.children, item)
 	fmt.Println("this.children is", this.children)
 }
 
 type indentationStack []([]treeItem)
 
-func (this *indentationStack) add(item treeItem, level int) {
+func (this indentationStack) add(item treeItem, level int) indentationStack {
 
 	if size := len(this) - 1; size < level {
 		this[level] = append(this[level], item)
@@ -37,6 +38,15 @@ func (this *indentationStack) add(item treeItem, level int) {
 		this = append(this, additional)
 		this[level] = append(this[level], item)
 	}
+	return this
+
+}
+
+// Factory function for type indentationStack
+func newIndentationStack() indentationStack {
+	var stack indentationStack
+	stack = make([]([]treeItem), 10)
+	return stack
 }
 
 type Parser struct {
@@ -46,9 +56,8 @@ type Parser struct {
 	identity      int
 }
 
-func (this *Parser) nextId() int {
-	nextId := this.identity + 1
-	return nextId
+func (this *Parser) nextId() {
+	this.identity = this.identity + 1
 }
 
 func isEOF(theToken token.Token) bool {
@@ -72,6 +81,7 @@ func (this *Parser) Parse(fileName string) {
 	}
 
 	fmt.Println(sequence)
+
 }
 
 func readFileToString(filename string) string {
