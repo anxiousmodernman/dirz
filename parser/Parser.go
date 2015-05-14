@@ -53,7 +53,11 @@ type Parser struct {
 	Tree          parseTree
 	stack         indentationStack
 	currentIndent int
+	currentLine   int
 	identity      int
+	State         ParseFn
+	tokens        []token.Token
+	pos           int
 }
 
 func (this *Parser) nextId() {
@@ -80,7 +84,17 @@ func (this *Parser) Parse(fileName string) {
 		}
 	}
 
-	fmt.Println(sequence)
+	this.tokens = sequence
+	this.pos = 0
+	this.parse()
+
+}
+
+func (this *Parser) parse() {
+
+	for state := ParseBegin; state != nil; {
+		state = state(this)
+	}
 
 }
 
