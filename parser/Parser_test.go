@@ -44,3 +44,8 @@ func Test_MakeNextId(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func Test_Parse3TreeItems(t *testing.T) {
+	parser := Parser{identity: 1}
+	ParseDirectory(&parser)
+}
