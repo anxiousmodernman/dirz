@@ -3,6 +3,8 @@ package parser
 import (
 	"fmt"
 	"testing"
+
+	"github.com/anxiousmodernman/dirz/token"
 )
 
 func Test_AddChildTreeItem(t *testing.T) {
@@ -46,6 +48,12 @@ func Test_MakeNextId(t *testing.T) {
 }
 
 func Test_Parse3TreeItems(t *testing.T) {
+
+	tkns := make([]token.Token, 10)
+	tkns = append(tkns,
+		token.Token{Type: token.TOKEN_SPACE, Value: " "},
+	)
+
 	parser := Parser{identity: 1}
 	ParseDirectory(&parser)
 }

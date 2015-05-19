@@ -2,12 +2,15 @@ package parser
 
 import (
 	"fmt"
+
 	"github.com/anxiousmodernman/dirz/token"
 )
 
 func ParseBegin(this *Parser) ParseFn {
 
 	currentToken := this.tokens[this.pos]
+
+	//	var nextLine []token.Token
 
 	switch currentToken.Type {
 
@@ -35,4 +38,6 @@ func ParseBegin(this *Parser) ParseFn {
 	default:
 		fmt.Println("Got invalid input")
 	}
+
+	return nil // todo
 }

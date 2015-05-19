@@ -2,8 +2,9 @@ package parser
 
 import (
 	"fmt"
-	"github.com/anxiousmodernman/dirz/token"
 	"os"
+
+	"github.com/anxiousmodernman/dirz/token"
 )
 
 func ParseDirectory(this *Parser) ParseFn {
@@ -16,6 +17,6 @@ func ParseDirectory(this *Parser) ParseFn {
 	// add treeItem to parseTree
 
 	//
-}
 
-func parseDirectoryWithIndent()
+	return nil
+}
