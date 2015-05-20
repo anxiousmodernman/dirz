@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/anxiousmodernman/dirz/token"
@@ -30,13 +29,6 @@ func Test_AddChildTreeItem(t *testing.T) {
 	}
 }
 
-func Test_CreateIndentationStack(t *testing.T) {
-
-	stack := newIndentationStack()
-
-	fmt.Println(stack)
-}
-
 func Test_MakeNextId(t *testing.T) {
 
 	parser := Parser{identity: 1}
@@ -51,9 +43,22 @@ func Test_Parse3TreeItems(t *testing.T) {
 
 	tkns := make([]token.Token, 10)
 	tkns = append(tkns,
-		token.Token{Type: token.TOKEN_SPACE, Value: " "},
+		token.Token{Type: token.TOKEN_SLASH, Value: token.SLASH},
+		token.Token{Type: token.TOKEN_DIRECTORY_NAME, Value: "dirA"},
+		token.Token{Type: token.TOKEN_NEWLINE, Value: token.NEWLINE},
+		token.Token{Type: token.TOKEN_SPACE, Value: token.SPACE},
+		token.Token{Type: token.TOKEN_SPACE, Value: token.SPACE},
+		token.Token{Type: token.TOKEN_SLASH, Value: token.SLASH},
+		token.Token{Type: token.TOKEN_DIRECTORY_NAME, Value: "dirB"},
+		token.Token{Type: token.TOKEN_NEWLINE, Value: token.NEWLINE},
+		token.Token{Type: token.TOKEN_SLASH, Value: token.SLASH},
+		token.Token{Type: token.TOKEN_DIRECTORY_NAME, Value: "dirA1"},
+		token.Token{Type: token.TOKEN_NEWLINE, Value: token.NEWLINE},
 	)
 
-	parser := Parser{identity: 1}
+	parser := Parser{
+		identity: 1,
+		tokens:   tkns,
+	}
 	ParseDirectory(&parser)
 }
