@@ -10,6 +10,9 @@ func ParseBegin(this *Parser) ParseFn {
 
 	currentToken := this.tokens[this.pos]
 
+	fmt.Println("all tokens", this.tokens)
+	fmt.Println("current token", currentToken.Type)
+
 	//	var nextLine []token.Token
 
 	switch currentToken.Type {

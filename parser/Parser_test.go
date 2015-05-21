@@ -41,7 +41,7 @@ func Test_MakeNextId(t *testing.T) {
 
 func Test_Parse3TreeItems(t *testing.T) {
 
-	tkns := make([]token.Token, 10)
+	tkns := make([]token.Token, 0)
 	tkns = append(tkns,
 		token.Token{Type: token.TOKEN_SLASH, Value: token.SLASH},
 		token.Token{Type: token.TOKEN_DIRECTORY_NAME, Value: "dirA"},
@@ -60,5 +60,6 @@ func Test_Parse3TreeItems(t *testing.T) {
 		identity: 1,
 		tokens:   tkns,
 	}
-	ParseDirectory(&parser)
+	//ParseDirectory(&parser)
+	parser.parse()
 }
