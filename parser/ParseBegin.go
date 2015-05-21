@@ -8,13 +8,19 @@ import (
 
 func ParseBegin(this *Parser) ParseFn {
 
+	this.previousIndent = this.currentIndent
+
+	if this.pos > len(this.tokens)-1 {
+		return nil
+	}
+
 	currentToken := this.tokens[this.pos]
 
 	fmt.Println("all tokens", this.tokens)
 	fmt.Println("current token", currentToken.Type)
 
 	//	var nextLine []token.Token
-
+	_ = "breakpoint"
 	switch currentToken.Type {
 
 	case token.TOKEN_SPACE:

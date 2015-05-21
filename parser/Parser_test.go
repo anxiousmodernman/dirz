@@ -54,12 +54,13 @@ func Test_Parse3TreeItems(t *testing.T) {
 		token.Token{Type: token.TOKEN_SLASH, Value: token.SLASH},
 		token.Token{Type: token.TOKEN_DIRECTORY_NAME, Value: "dirA1"},
 		token.Token{Type: token.TOKEN_NEWLINE, Value: token.NEWLINE},
+		token.Token{Type: token.TOKEN_EOF, Value: ""},
 	)
 
 	parser := Parser{
 		identity: 1,
 		tokens:   tkns,
+		Tree:     make(parseTree),
 	}
-	//ParseDirectory(&parser)
 	parser.parse()
 }

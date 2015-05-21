@@ -50,14 +50,15 @@ func newIndentationStack() indentationStack {
 }
 
 type Parser struct {
-	Tree          parseTree
-	stack         indentationStack
-	currentIndent int
-	currentLine   int
-	identity      int
-	State         ParseFn
-	tokens        []token.Token
-	pos           int
+	Tree           parseTree
+	stack          indentationStack
+	currentIndent  int
+	previousIndent int
+	currentLine    int
+	identity       int
+	State          ParseFn
+	tokens         []token.Token
+	pos            int
 }
 
 func (this *Parser) nextId() {
