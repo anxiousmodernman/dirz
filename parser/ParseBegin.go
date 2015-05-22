@@ -15,12 +15,7 @@ func ParseBegin(this *Parser) ParseFn {
 	}
 
 	currentToken := this.tokens[this.pos]
-
-	fmt.Println("all tokens", this.tokens)
-	fmt.Println("current token", currentToken.Type)
-
-	//	var nextLine []token.Token
-	_ = "breakpoint"
+	//_ = "breakpoint"
 	switch currentToken.Type {
 
 	case token.TOKEN_SPACE:
@@ -29,8 +24,8 @@ func ParseBegin(this *Parser) ParseFn {
 		return ParseBegin
 
 	case token.TOKEN_SLASH:
-		this.pos++
 		fmt.Println("Got TOKEN_SLASH")
+		this.pos++
 		return ParseDirectory
 
 	case token.TOKEN_FILE:

@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/anxiousmodernman/dirz/token"
@@ -63,4 +64,5 @@ func Test_Parse3TreeItems(t *testing.T) {
 		Tree:     make(parseTree),
 	}
 	parser.parse()
+	fmt.Println(parser.Tree)
 }
