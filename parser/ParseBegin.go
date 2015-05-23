@@ -21,6 +21,7 @@ func ParseBegin(this *Parser) ParseFn {
 	case token.TOKEN_SPACE:
 		fmt.Println("Got TOKEN_SPACE")
 		this.pos++
+		this.cur
 		return ParseBegin
 
 	case token.TOKEN_SLASH:
