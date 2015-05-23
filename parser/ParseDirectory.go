@@ -23,7 +23,7 @@ func ParseDirectory(this *Parser) ParseFn {
 		isDirectory:  true,
 		isFile:       false,
 		templateName: "",
-		parentId:     -1,
+		parentId:     -1, // determine if it has a parent
 	}
 
 	this.Tree[item.id] = item
