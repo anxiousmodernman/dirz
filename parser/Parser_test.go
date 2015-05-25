@@ -63,6 +63,7 @@ func Test_Parse3TreeItems(t *testing.T) {
 		tokens:   tkns,
 		Tree:     make(parseTree),
 	}
+	parser.stack = newIndentationStack()
 	parser.parse()
 	fmt.Println(parser.Tree)
 }

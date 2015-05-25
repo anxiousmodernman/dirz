@@ -59,6 +59,7 @@ type Parser struct {
 	State          ParseFn
 	tokens         []token.Token
 	pos            int
+	// Add a simple slice of map[treeItem.id]indentationLevel
 }
 
 func (this *Parser) nextId() {
