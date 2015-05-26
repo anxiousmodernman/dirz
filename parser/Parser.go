@@ -27,28 +27,6 @@ func (this *treeItem) AddChild(item treeItem) {
 	fmt.Println("this.children is", this.children)
 }
 
-type indentationStack []([]treeItem)
-
-func (this indentationStack) add(item treeItem, level int) indentationStack {
-
-	if size := len(this) - 1; size < level {
-		this[level] = append(this[level], item)
-	} else {
-		additional := make([]treeItem, 0)
-		this = append(this, additional)
-		this[level] = append(this[level], item)
-	}
-	return this
-
-}
-
-// Factory function for type indentationStack
-func newIndentationStack() indentationStack {
-	var stack indentationStack
-	stack = make([]([]treeItem), 10)
-	return stack
-}
-
 type Parser struct {
 	Tree           parseTree
 	stack          indentationStack

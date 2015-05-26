@@ -25,7 +25,9 @@ func ParseDirectory(this *Parser) ParseFn {
 		templateName: "",
 		parentId:     -1, // determine if it has a parent
 	}
-
+	if this.currentIndent < this.previousIndent {
+		// add to the previous indentation stack
+	}
 	this.Tree[item.id] = item
 	fmt.Println("printing parseTree", this.Tree)
 
