@@ -18,7 +18,7 @@ type treeItem struct {
 	isFile       bool
 	templateName string
 	parentId     int
-	children     []treeItem
+	children     []treeItem // todo change to id?
 }
 
 func (this *treeItem) AddChild(item treeItem) {
@@ -29,7 +29,7 @@ func (this *treeItem) AddChild(item treeItem) {
 
 type Parser struct {
 	Tree           parseTree
-	stack          indentationStack
+	stack          []indentationStack
 	currentIndent  int
 	previousIndent int
 	currentLine    int
