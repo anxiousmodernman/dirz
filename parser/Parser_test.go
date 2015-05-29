@@ -62,6 +62,7 @@ func Test_Parse3TreeItems(t *testing.T) {
 		identity: 1,
 		tokens:   tkns,
 		Tree:     make(parseTree),
+		stack:    make([]indentationStack, 20),
 	}
 	parser.parse()
 	fmt.Println(parser.Tree)
